@@ -9,23 +9,14 @@ export function setCaramelle(n) {
     }
 }
 
+// Questa sarà una variabile che conterrà la funzione vera
+let closePopupInternal = null;
+
+// Funzione wrapper esportata
 export function closePopup() {
-    document.getElementById("overlay").style.display = "none";
-    document.getElementById("overlay2").style.display = "none";
-    document.getElementById("overlay3").style.display = "none";
-
-    celle.forEach(c => c.remove());
-
-    celle = [];
-    tesori = [];
-    cliccata = [];
-    trovati = 0;
-    cmoltiplicatore = 1;
-    inGioco = false;
-    totalescommessa = 0;
-    const scommessaEl = document.getElementById("scommessa");
-    if (scommessaEl) scommessaEl.value = 0;
-    aggiornaMoltiplicatore();
+    if (closePopupInternal) {
+        closePopupInternal();
+    }
 }
 
 // ============================================================================
@@ -61,6 +52,10 @@ export function initGame() {
         return;
     }
 
+    // Seleziona automaticamente la difficoltà Facile
+    versione = 1;
+    v1.classList.add("active");
+
     // ============================================================================
     //  FUNZIONI INTERNE
     // ============================================================================
@@ -85,6 +80,28 @@ export function initGame() {
             }, 500);
         }
     }
+
+    // ============================================================================
+    //  CHIUDI POPUP (funzione interna)
+    // ============================================================================
+    closePopupInternal = function() {
+        document.getElementById("overlay").style.display = "none";
+        document.getElementById("overlay2").style.display = "none";
+        document.getElementById("overlay3").style.display = "none";
+
+        celle.forEach(c => c.remove());
+
+        celle = [];
+        tesori = [];
+        cliccata = [];
+        trovati = 0;
+        cmoltiplicatore = 1;
+        inGioco = false;
+        totalescommessa = 0;
+        const scommessaEl = document.getElementById("scommessa");
+        if (scommessaEl) scommessaEl.value = 0;
+        aggiornaMoltiplicatore();
+    };
 
     // ============================================================================
     //  GESTIONE VERSIONI
@@ -180,7 +197,17 @@ export function initGame() {
     //  GENERA CELLE
     // ============================================================================
     function generacelle() {
-        if (totalescommessa <= 0) return;
+        // Controlla se è stata selezionata una difficoltà
+        if (versione === 0) {
+            alert("⚠️ Seleziona prima una difficoltà!");
+            return;
+        }
+
+        // Controlla se c'è una scommessa
+        if (totalescommessa <= 0) {
+            alert("⚠️ Inserisci una scommessa!");
+            return;
+        }
 
         celle.forEach(c => c.remove());
         celle = [];
