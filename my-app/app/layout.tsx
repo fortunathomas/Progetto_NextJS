@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Next App",
-    description: "Esempio ordinamenti TS + Next",
+    title: "Metodi di ordinamento",
+    description: "Alprazolam la mia vita è tuff",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
