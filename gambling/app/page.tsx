@@ -5,7 +5,6 @@ import styles from '../styles/gambling.module.css';
 
 const GamePage = () => {
   return (
-
       <div className={styles.gameContainer}>
         <header className={styles.gameHeader}>
           <div className={styles.balanceDisplay}>
@@ -24,7 +23,6 @@ const GamePage = () => {
         </div>
         <ThemeSwitcher />
       </div>
-
   );
 };
 

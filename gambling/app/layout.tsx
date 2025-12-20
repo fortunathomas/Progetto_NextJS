@@ -1,23 +1,40 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../styles/globals.css';
 import { closePopup, setCaramelle, initGame } from "../script/gameLogic.js";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
+    const [gameStarted, setGameStarted] = useState(false);
 
     useEffect(() => {
         // Inizializza il gioco dopo che il DOM è pronto
         initGame();
+
+        // Listener per mostrare la griglia quando il gioco inizia
+        const gridElement = document.getElementById('grid');
+        if (gridElement) {
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'childList' && gridElement.children.length > 0) {
+                        setGameStarted(true);
+                    }
+                });
+            });
+
+            observer.observe(gridElement, { childList: true });
+
+            return () => observer.disconnect();
+        }
     }, []);
 
     return (
         <html lang="it">
-            <head>
+        <head>
             <title>💎 Caccia al Tesoro</title>
             <link rel="stylesheet" href="../styles/globals.css" />
             <script src="../script/gameLogic.js" defer></script>
-    </head>
+        </head>
         <body>
 
         <div id="theme-switcher">
@@ -50,10 +67,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 </button>
             </div>
         </div>
-    
 
         <div className="game-container">
-    
 
             <header className="game-header">
                 <div className="balance-display">
@@ -61,13 +76,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     <span className="balance-amount"><span id="caramelle"></span> 💵</span>
                 </div>
             </header>
-    
 
             <div className="game-layout">
-    
 
                 <aside className="controls-panel">
-    
 
                     <section className="control-section">
                         <h3 className="section-title">Seleziona Difficoltà</h3>
@@ -86,7 +98,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                             </button>
                         </div>
                     </section>
-    
 
                     <section className="control-section">
                         <h3 className="section-title">Imposta Puntata</h3>
@@ -101,7 +112,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                         </div>
                         <button id="maxbet" className="max-bet-btn">MAX BET</button>
                     </section>
-    
 
                     <section className="control-section info-section">
                         <div className="info-row">
@@ -113,7 +123,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                             <span className="info-value"><span id="vincita"></span> 💵</span>
                         </div>
                     </section>
-    
 
                     <div className="action-buttons">
                         <button id="start" className="action-btn primary-btn">
@@ -123,51 +132,50 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                             💰 RITIRA VINCITA
                         </button>
                     </div>
-    
+
                 </aside>
-    
 
                 <main className="game-area">
-                    <div className="grid-wrapper">
+                    <div className={`grid-wrapper ${!gameStarted ? 'hidden' : ''}`}>
                         <div id="grid"></div>
                     </div>
                 </main>
-    
+
             </div>
         </div>
-    
 
-        <div id="overlay" className="overlay">
-            <div id="popup" className="popup popup-lose">
+        {/* Popup Sconfitta */}
+        <div id="loseOverlay" className="overlay">
+            <div id="losePopup" className="popup popup-lose">
                 <div className="popup-icon">💣</div>
                 <h2 className="popup-title">HAI PERSO!</h2>
                 <p className="popup-message">La bomba ti ha fatto saltare in aria!</p>
                 <button onClick={closePopup} className="popup-btn">Riprova</button>
             </div>
         </div>
-    
 
-        <div id="overlay2" className="overlay">
-            <div id="popup2" className="popup popup-win">
+        {/* Popup Vittoria */}
+        <div id="winOverlay" className="overlay">
+            <div id="winPopup" className="popup popup-win">
                 <div className="popup-icon">💎</div>
                 <h2 className="popup-title">HAI VINTO!</h2>
                 <p className="popup-message">Hai trovato tutti i tesori!</p>
                 <button onClick={closePopup} className="popup-btn">Fantastico!</button>
             </div>
         </div>
-    
 
-        <div id="overlay3" className="overlay">
-            <div id="popup3" className="popup popup-cashout">
+        {/* Popup Incasso */}
+        <div id="cashoutOverlay" className="overlay">
+            <div id="cashoutPopup" className="popup popup-cashout">
                 <div className="popup-icon">💰</div>
                 <h2 className="popup-title">VINCITA RITIRATA!</h2>
                 <p className="popup-message">Hai incassato la tua vincita!</p>
                 <button onClick={closePopup} className="popup-btn">Perfetto!</button>
             </div>
         </div>
-    
+
         </body>
-    </html>
+        </html>
     );
 };
 

@@ -482,6 +482,12 @@ body {
   border-radius: 20px;
   padding: 30px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Classe per nascondere il grid-wrapper finché non compaiono le celle */
+.grid-wrapper.hidden {
+  display: none;
 }
 
 #grid {

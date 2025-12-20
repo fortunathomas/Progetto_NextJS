@@ -85,9 +85,9 @@ export function initGame() {
     //  CHIUDI POPUP (funzione interna)
     // ============================================================================
     closePopupInternal = function() {
-        document.getElementById("overlay").style.display = "none";
-        document.getElementById("overlay2").style.display = "none";
-        document.getElementById("overlay3").style.display = "none";
+        document.getElementById("winOverlay").style.display = "none";
+        document.getElementById("loseOverlay").style.display = "none";
+        document.getElementById("cashoutOverlay").style.display = "none";
 
         celle.forEach(c => c.remove());
 
@@ -271,7 +271,7 @@ export function initGame() {
                         setTimeout(() => {
                             setCaramelle(getCaramelle() - totalescommessa);
                             inGioco = false;
-                            document.getElementById("overlay").style.display = "flex";
+                            document.getElementById("loseOverlay").style.display = "flex";
                         }, 600);
 
                         return;
@@ -297,7 +297,7 @@ export function initGame() {
                         setTimeout(() => {
                             setCaramelle(getCaramelle() + premio);
                             inGioco = false;
-                            document.getElementById("overlay2").style.display = "flex";
+                            document.getElementById("winOverlay").style.display = "flex";
                         }, 800);
                     }
                 }, 300);
@@ -317,7 +317,7 @@ export function initGame() {
         setCaramelle(getCaramelle() + premio - totalescommessa);
 
         inGioco = false;
-        document.getElementById("overlay3").style.display = "flex";
+        document.getElementById("cashoutOverlay").style.display = "flex";
     });
 
     // ============================================================================
