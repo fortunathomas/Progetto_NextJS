@@ -25,6 +25,7 @@ export function initGame() {
     // Inizializza i controlli
     initVersionControls(elementi);
     initBetControls(elementi);
+    initBombControls();
     initActionButtons(elementi);
     initThemeSystem();
 
@@ -65,14 +66,18 @@ function verificaElementiDOM() {
 function initVersionControls({ v1, v2, v3 }) {
     const versioni = [v1, v2, v3];
 
-    // Listener per cambiare la versione
     versioni.forEach((btn, index) => {
         btn.addEventListener("click", () => {
             if (state.inGioco) return;
-            
+
             versioni.forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
             state.setVersione(index + 1);
+
+            // Aggiorna max bombe quando cambia versione
+            if (window._aggiornaMaxBombe) {
+                window._aggiornaMaxBombe();
+            }
         });
     });
 }
@@ -130,6 +135,120 @@ function aggiungiScommessa(amount) {
     if (state.inGioco) return;
     setTotaleScommessa(state.totalescommessa + amount);
 }
+// ============================================================================
+//  INIZIALIZZAZIONE CONTROLLI BOMBE
+// ============================================================================
+function initBombControls() {
+    const numBombeInput = document.getElementById("numBombe");
+    const decreaseBombs = document.getElementById("decreaseBombs");
+    const increaseBombs = document.getElementById("increaseBombs");
+    const riskLevel = document.getElementById("riskLevel");
+
+    if (!numBombeInput || !decreaseBombs || !increaseBombs) {
+        console.warn("Bomb control elements not found");
+        return;
+    }
+
+    // Aggiorna il max quando cambia versione
+    function aggiornaMaxBombe() {
+        const totaleCelle = utils.getTotaleCelle(state.versione);
+        if (totaleCelle === 0) {
+            numBombeInput.max = 1;
+            state.setNumBombe(1);
+            numBombeInput.value = 1;
+            return;
+        }
+
+        const maxBombe = utils.getMaxBombe(totaleCelle);
+        numBombeInput.max = maxBombe;
+
+        if (state.numBombe > maxBombe) {
+            state.setNumBombe(maxBombe);
+            numBombeInput.value = maxBombe;
+        }
+
+        aggiornaRischio();
+        state.aggiornaMoltiplicatore(state.versione, state.numBombe);
+    }
+
+    // Aggiorna livello di rischio
+    function aggiornaRischio() {
+        if (!riskLevel) return;
+
+        const totaleCelle = utils.getTotaleCelle(state.versione);
+        if (totaleCelle === 0) {
+            riskLevel.textContent = "SELEZIONA GRIGLIA";
+            riskLevel.className = "risk-indicator";
+            return;
+        }
+
+        const percentuale = (state.numBombe / totaleCelle) * 100;
+
+        if (percentuale >= 50) {
+            riskLevel.textContent = "ESTREMO 🔥";
+            riskLevel.className = "risk-indicator risk-extreme";
+        } else if (percentuale >= 40) {
+            riskLevel.textContent = "MOLTO ALTO ⚠️";
+            riskLevel.className = "risk-indicator risk-very-high";
+        } else if (percentuale >= 30) {
+            riskLevel.textContent = "ALTO 📈";
+            riskLevel.className = "risk-indicator risk-high";
+        } else if (percentuale >= 20) {
+            riskLevel.textContent = "MEDIO ⚖️";
+            riskLevel.className = "risk-indicator risk-medium";
+        } else if (percentuale >= 10) {
+            riskLevel.textContent = "BASSO 📉";
+            riskLevel.className = "risk-indicator risk-low";
+        } else {
+            riskLevel.textContent = "MOLTO BASSO 🛡️";
+            riskLevel.className = "risk-indicator risk-very-low";
+        }
+    }
+
+    // Listeners
+    decreaseBombs.addEventListener("click", () => {
+        if (state.inGioco) return;
+        const min = parseInt(numBombeInput.min) || 1;
+        if (state.numBombe > min) {
+            state.setNumBombe(state.numBombe - 1);
+            numBombeInput.value = state.numBombe;
+            aggiornaRischio();
+            state.aggiornaMoltiplicatore(state.versione, state.numBombe);
+        }
+    });
+
+    increaseBombs.addEventListener("click", () => {
+        if (state.inGioco) return;
+        const max = parseInt(numBombeInput.max);
+        if (state.numBombe < max) {
+            state.setNumBombe(state.numBombe + 1);
+            numBombeInput.value = state.numBombe;
+            aggiornaRischio();
+            state.aggiornaMoltiplicatore(state.versione, state.numBombe);
+        }
+    });
+
+    numBombeInput.addEventListener("change", () => {
+        if (state.inGioco) return;
+        let val = parseInt(numBombeInput.value) || 1;
+        const min = parseInt(numBombeInput.min) || 1;
+        const max = parseInt(numBombeInput.max);
+
+        if (val < min) val = min;
+        if (val > max) val = max;
+
+        state.setNumBombe(val);
+        numBombeInput.value = val;
+        aggiornaRischio();
+        state.aggiornaMoltiplicatore(state.versione, state.numBombe);
+    });
+
+    // Esporta per usarla quando cambia versione
+    window._aggiornaMaxBombe = aggiornaMaxBombe;
+
+    // Inizializzazione
+    aggiornaRischio();
+}
 
 // ============================================================================
 //  INIZIALIZZAZIONE PULSANTI AZIONE
@@ -146,14 +265,12 @@ function initActionButtons({ start, accontentati }) {
 //  AVVIO PARTITA
 // ============================================================================
 function startGame() {
-    // Valida la versione
     const versionCheck = utils.validaVersione(state.versione);
     if (!versionCheck.valid) {
         alert(versionCheck.message);
         return;
     }
 
-    // Valida la scommessa
     const betCheck = utils.validaScommessa(state.totalescommessa, state.getCaramelle());
     if (!betCheck.valid) {
         alert(betCheck.message);
@@ -164,18 +281,18 @@ function startGame() {
     state.setInGioco(true);
     state.setMoltiplicatore(1);
     state.setTrovati(0);
-    state.aggiornaMoltiplicatore();
+    state.aggiornaMoltiplicatore(state.versione, state.numBombe);
 
-    // Crea la griglia
-    const success = grid.creaGriglia(state.versione, themes.currentTheme);
+    // Crea la griglia CON numero bombe
+    const success = grid.creaGriglia(state.versione, state.numBombe, themes.currentTheme);
     if (!success) {
         console.error("Failed to create grid");
         state.setInGioco(false);
         return;
     }
 
-    // Aggiunge i listener alle celle
-    grid.addAllClickHandlers(state.versione);
+    // Aggiunge i listener alle celle CON numero bombe
+    grid.addAllClickHandlers(state.versione, state.numBombe);
 }
 
 // ============================================================================
@@ -184,16 +301,39 @@ function startGame() {
 function cashout() {
     if (!state.inGioco) return;
 
+    if (state.trovati === 0) {
+        alert("⚠️ Devi scoprire almeno una cella prima di ritirare!");
+        return;
+    }
+
     const premio = utils.calcolaPremioChashout(state.totalescommessa, state.cmoltiplicatore);
 
-    hideGridWrapper(); // ← Aggiunto
+    // Rivela tutte le celle
+    grid.celle.forEach((c, i) => {
+        if (!grid.cliccata[i]) {
+            c.innerHTML = "";
+            if (grid.bombe.includes(i)) {
+                c.classList.add('bomb-reveal-cashout');
+                c.innerHTML = "💣";
+            } else {
+                c.classList.add('diamond-reveal-missed');
+                c.innerHTML = "💎";
+            }
+        }
+    });
 
-    // Aggiorna il saldo (premio - scommessa iniziale)
-    state.setCaramelle(state.getCaramelle() + premio - state.totalescommessa);
-    state.setInGioco(false);
+    setTimeout(() => {
+        grid.hideGridWrapper();
 
-    // Mostra popup di cashout
-    popups.showCashoutPopup();
+        state.setCaramelle(state.getCaramelle() + premio - state.totalescommessa);
+
+        // Aggiorna statistiche
+        const statEl = document.getElementById("statCashout");
+        if (statEl) statEl.textContent = premio;
+
+        state.setInGioco(false);
+        popups.showCashoutPopup();
+    }, 500);
 }
 
 // ============================================================================

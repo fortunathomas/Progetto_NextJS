@@ -134,3 +134,26 @@
     font-size: 35px;
   }
 }
+
+/* Bomba secondaria (altre bombe rivelate) */
+#grid button.bomb-reveal-secondary {
+    background: #cc0000;
+    opacity: 0.7;
+}
+
+/* Diamante mancato */
+#grid button.diamond-reveal-missed {
+    opacity: 0.5;
+}
+
+/* Bomba alla vittoria */
+#grid button.bomb-reveal-win {
+    background: #666;
+    opacity: 0.6;
+}
+
+/* Bomba al cashout */
+#grid button.bomb-reveal-cashout {
+    background: #999;
+    opacity: 0.5;
+}

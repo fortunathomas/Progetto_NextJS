@@ -9,6 +9,13 @@ export let totalescommessa = 0;
 export let cmoltiplicatore = 1;
 export let trovati = 0;
 
+export let numBombe = 1;  // Numero di bombe selezionate
+
+// Setter per numBombe
+export function setNumBombe(value) {
+    numBombe = value;
+}
+
 // Setters per modificare lo stato
 export function setVersione(v) {
     versione = v;
@@ -71,12 +78,20 @@ export function resetScommessa() {
 // ============================================================================
 //  GESTIONE MOLTIPLICATORE
 // ============================================================================
-export function aggiornaMoltiplicatore() {
+export function aggiornaMoltiplicatore(versione = 0, numBombe = 1) {
     const moltiplicatoreEl = document.getElementById("moltiplicatore");
     const vincitaEl = document.getElementById("vincita");
+    const celleSicureEl = document.getElementById("celleSicure");
+    const totaleCelleEl = document.getElementById("totaleCelle");
 
     if (moltiplicatoreEl) moltiplicatoreEl.textContent = cmoltiplicatore.toFixed(2);
     if (vincitaEl) vincitaEl.textContent = Math.floor(totalescommessa * cmoltiplicatore);
+
+    // Aggiorna contatore celle sicure
+    const totaleCelle = getTotaleCelle(versione);
+    const celleSicureTotali = totaleCelle - numBombe;
+    if (celleSicureEl) celleSicureEl.textContent = trovati;
+    if (totaleCelleEl) totaleCelleEl.textContent = celleSicureTotali;
 
     if (inGioco && cmoltiplicatore > 1) {
         moltiplicatoreEl?.parentElement.classList.add('pulse');
@@ -89,6 +104,11 @@ export function aggiornaMoltiplicatore() {
     }
 }
 
+// Helper per ottenere il totale celle
+function getTotaleCelle(versione) {
+    return versione === 1 ? 9 : versione === 2 ? 16 : versione === 3 ? 25 : 0;
+}
+
 // ============================================================================
 //  RESET STATO
 // ============================================================================
@@ -98,6 +118,7 @@ export function resetState() {
     totalescommessa = 0;
     cmoltiplicatore = 1;
     trovati = 0;
+    numBombe = 1;  // ← AGGIUNGI questa riga
     resetScommessa();
     aggiornaMoltiplicatore();
 }

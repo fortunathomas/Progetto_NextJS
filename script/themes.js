@@ -65,6 +65,66 @@ export const themes = {
         cellBg: '#0369a1',
         text: '#e0f2fe',
         textDark: '#0c4a6e'
+    },
+    cyberpunk: {
+        primary: '#ff00ff',
+        primaryHover: '#cc00cc',
+        secondary: '#00ffff',
+        background: '#0a0a0a',
+        cardBg: '#1a0a1f',
+        cellBg: '#2d1b3d',
+        text: '#00ffff',
+        textDark: '#0a0a0a'
+    },
+    lava: {
+        primary: '#ff4500',
+        primaryHover: '#ff6347',
+        secondary: '#ff8c00',
+        background: '#1a0000',
+        cardBg: '#330000',
+        cellBg: '#4d0000',
+        text: '#ffcc99',
+        textDark: '#1a0000'
+    },
+    arctic: {
+        primary: '#00d4ff',
+        primaryHover: '#00bfea',
+        secondary: '#b3e5fc',
+        background: '#0a1929',
+        cardBg: '#1e3a52',
+        cellBg: '#2d4f6b',
+        text: '#e1f5fe',
+        textDark: '#0a1929'
+    },
+    goldRush: {
+        primary: '#ffd700',
+        primaryHover: '#ffed4e',
+        secondary: '#ffb347',
+        background: '#000000',
+        cardBg: '#1a1410',
+        cellBg: '#2d2416',
+        text: '#fff8dc',
+        textDark: '#000000'
+    },
+    purpleHaze: {
+        primary: '#9c27b0',
+        primaryHover: '#ba68c8',
+        secondary: '#e91e63',
+        background: '#1a0033',
+        cardBg: '#2d0052',
+        cellBg: '#3d006b',
+        text: '#f3e5f5',
+        textDark: '#1a0033'
+    },
+    matrix: {
+        primary: '#00ff00',
+        primaryHover: '#00cc00',
+        secondary: '#39ff14',
+        background: '#000000',
+        cardBg: '#001a00',
+        cellBg: '#003300',
+        text: '#00ff00',
+        textDark: '#000000'
     }
 };
 
@@ -76,6 +136,7 @@ const themeImages = {
     'forest': 'images/forest-square.png',
     'sunset': 'images/tramonto-square.png',
     'ocean': 'images/oceano-square.png'
+
 };
 
 // Ottiene l'immagine per un tema specifico

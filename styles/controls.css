@@ -252,3 +252,20 @@
     position: static;
   }
 }
+
+/* Livello di rischio */
+.risk-indicator {
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 700;
+    text-align: center;
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+}
+
+.risk-very-low { background: #10b981; color: white; }
+.risk-low { background: #34d399; color: white; }
+.risk-medium { background: #fbbf24; color: black; }
+.risk-high { background: #f97316; color: white; }
+.risk-very-high { background: #ef4444; color: white; }
+.risk-extreme { background: #dc2626; color: white; animation: pulse 1s infinite; }

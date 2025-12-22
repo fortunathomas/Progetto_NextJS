@@ -10,13 +10,13 @@ import { getThemeImage } from './themes.js';
 
 // Array per gestire le celle
 export let celle = [];
-export let tesori = [];
+export let bombe = [];
 export let cliccata = [];
 
 // Reset degli array
 export function resetArrays() {
     celle = [];
-    tesori = [];
+    bombe = [];
     cliccata = [];
 }
 
@@ -28,18 +28,16 @@ export function clearGrid() {
 }
 
 // Crea la griglia di gioco
-export function creaGriglia(versione, currentTheme) {
+export function creaGriglia(versione, numBombe, currentTheme) {
     const grid = document.getElementById("grid");
     if (!grid) {
         console.error("Grid element not found");
         return false;
     }
 
-    // Pulisce la griglia esistente
     clearGrid();
 
-    // Ottiene le dimensioni dalla versione
-    const gridSize = utils.getGridSize(versione);
+    const gridSize = utils.getTotaleCelle(versione);
     const columns = utils.getGridColumns(versione);
 
     if (gridSize === 0) {
@@ -47,7 +45,6 @@ export function creaGriglia(versione, currentTheme) {
         return false;
     }
 
-    // Imposta le colonne della griglia
     grid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
 
     // Crea le celle
@@ -58,12 +55,10 @@ export function creaGriglia(versione, currentTheme) {
         cliccata.push(false);
     }
 
-    // Genera l'indice della bomba
-    const indiceBomba = utils.getRandomBombIndex(celle.length);
-    tesori = [indiceBomba];
+    // Genera gli indici delle bombe (non più solo 1!)
+    bombe = utils.getRandomBombIndexes(gridSize, numBombe);
 
-    // Alla fine della funzione
-    showGridWrapper(); // ← Aggiunto
+    showGridWrapper();
     return true;
 }
 
@@ -82,96 +77,134 @@ function creaCella(index, currentTheme) {
 }
 
 // Aggiunge il listener di click alla cella
-export function addCellClickHandler(cella, index, versione) {
-    cella.addEventListener("click", () => handleCellClick(index, versione));
+export function addCellClickHandler(cella, index, versione, numBombe) {
+    cella.addEventListener("click", () => handleCellClick(index, versione, numBombe));
 }
 
 // Aggiunge i listener a tutte le celle
-export function addAllClickHandlers(versione) {
+export function addAllClickHandlers(versione, numBombe) {
     celle.forEach((cella, index) => {
-        addCellClickHandler(cella, index, versione);
+        addCellClickHandler(cella, index, versione, numBombe);
     });
 }
 
 // Gestisce il click su una cella
-async function handleCellClick(index, versione) {
-    // Previene click multipli sulla stessa cella
+async function handleCellClick(index, versione, numBombe) {
     if (cliccata[index]) return;
-    
+
     cliccata[index] = true;
     const cella = celle[index];
 
-    // Animazione iniziale
     animations.addRevealAnimation(cella);
-
     await animations.delay(300);
 
     cella.innerHTML = "";
 
     // Controlla se è una bomba
-    if (tesori.includes(index)) {
-        await handleBombClick(cella);
+    if (bombe.includes(index)) {
+        await handleBombClick(cella, versione, numBombe);
         return;
     }
 
     // È un diamante
-    await handleDiamondClick(cella, versione);
+    await handleDiamondClick(cella, versione, numBombe);
 }
 
 // Gestisce il click su una bomba
-async function handleBombClick(cella) {
+async function handleBombClick(cella, versione, numBombe) {
     animations.addBombAnimation(cella);
     cella.innerHTML = "💣";
     animations.shakeGrid();
 
-    await animations.delay(600);
+    // Rivela tutte le celle
+    await animations.delay(300);
+    celle.forEach((c, i) => {
+        if (!cliccata[i]) {
+            c.innerHTML = "";
+            if (bombe.includes(i)) {
+                c.classList.add('bomb-reveal-secondary');
+                c.innerHTML = "💣";
+            } else {
+                c.classList.add('diamond-reveal-missed');
+                c.innerHTML = "💎";
+            }
+        }
+    });
+
+    await animations.delay(700);
 
     hideGridWrapper();
-    // Aggiorna il saldo
-    state.setCaramelle(state.getCaramelle() - state.totalescommessa);
-    state.setInGioco(false);
 
-    // Mostra popup di sconfitta
+    // Aggiorna saldo e mostra popup
+    state.setCaramelle(state.getCaramelle() - state.totalescommessa);
+
+    // Aggiorna statistiche
+    const statEl = document.getElementById("statCelleTrovate");
+    if (statEl) statEl.textContent = state.trovati;
+
+    state.setInGioco(false);
     popups.showLosePopup();
 }
 
 // Gestisce il click su un diamante
-async function handleDiamondClick(cella, versione) {
+async function handleDiamondClick(cella, versione, numBombe) {
     const isCombo = state.trovati >= 2;
-    
+
     animations.addDiamondAnimation(cella, isCombo);
     cella.innerHTML = "💎";
-    
+
     state.incrementTrovati();
 
-    // Aggiorna il moltiplicatore
-    const boost = utils.getSafeBoost(versione);
-    state.multiplyMoltiplicatore(boost);
-    state.aggiornaMoltiplicatore();
+    // Calcola moltiplicatore dinamico
+    const totaleCelle = utils.getTotaleCelle(versione);
+    const celleRimaste = totaleCelle - state.trovati;
+    const bombeRimaste = numBombe;
 
-    // Controlla se ha vinto (trovato tutti i diamanti)
-    if (state.trovati === celle.length - 1) {
-        await handleVictory(versione);
+    const stepMolt = utils.calcolaMoltiplicatorePerCella(celleRimaste, bombeRimaste);
+    state.multiplyMoltiplicatore(stepMolt);
+    state.aggiornaMoltiplicatore(versione, numBombe);
+
+    // Controlla vittoria
+    const celleSicureTotali = totaleCelle - numBombe;
+    if (state.trovati === celleSicureTotali) {
+        await handleVictory(versione, numBombe);
     }
 }
 
 // Gestisce la vittoria completa
-async function handleVictory(versione) {
-    await animations.delay(800);
+async function handleVictory(versione, numBombe) {
+    // Rivela le bombe rimaste
+    await animations.delay(300);
+    celle.forEach((c, i) => {
+        if (!cliccata[i]) {
+            c.innerHTML = "";
+            if (bombe.includes(i)) {
+                c.classList.add('bomb-reveal-win');
+                c.innerHTML = "💣";
+            }
+        }
+    });
 
-    hideGridWrapper();
-    const bonus = utils.getBonusFinale(versione);
+    await animations.delay(900);
+
+    const totaleCelle = utils.getTotaleCelle(versione);
+    const bonus = utils.getBonusFinale(numBombe, totaleCelle);
     const premio = utils.calcolaPremio(
-        state.totalescommessa, 
-        state.cmoltiplicatore, 
+        state.totalescommessa,
+        state.cmoltiplicatore,
         bonus
     );
 
-    // Aggiorna il saldo
-    state.setCaramelle(state.getCaramelle() + premio);
-    state.setInGioco(false);
+    hideGridWrapper();
 
-    // Mostra popup di vittoria
+    // Aggiorna saldo
+    state.setCaramelle(state.getCaramelle() + premio);
+
+    // Aggiorna statistiche
+    const statEl = document.getElementById("statVincita");
+    if (statEl) statEl.textContent = premio;
+
+    state.setInGioco(false);
     popups.showWinPopup();
 }
 

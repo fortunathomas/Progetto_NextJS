@@ -82,3 +82,23 @@ export async function animateDiamondSequence(cella, isCombo = false) {
     addDiamondAnimation(cella, isCombo);
     cella.innerHTML = "💎";
 }
+
+// Animazione bomba secondaria (per le altre bombe)
+export function addBombSecondaryAnimation(cella) {
+    cella.classList.add('bomb-reveal-secondary');
+}
+
+// Animazione diamante mancato
+export function addDiamondMissedAnimation(cella) {
+    cella.classList.add('diamond-reveal-missed');
+}
+
+// Animazione bomba alla vittoria
+export function addBombWinAnimation(cella) {
+    cella.classList.add('bomb-reveal-win');
+}
+
+// Animazione bomba al cashout
+export function addBombCashoutAnimation(cella) {
+    cella.classList.add('bomb-reveal-cashout');
+}
