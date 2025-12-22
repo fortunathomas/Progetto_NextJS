@@ -110,13 +110,17 @@ function getTotaleCelle(versione) {
 // ============================================================================
 //  RESET STATO
 // ============================================================================
-export function resetState() {
+export function resetState(keepBet = false) {
     versione = 0;
     inGioco = false;
-    totalescommessa = 0;
+
+    if (!keepBet) {
+        totalescommessa = 0;
+        resetScommessa();
+    }
+
     cmoltiplicatore = 1;
     trovati = 0;
-    numBombe = 1; // ← AGGIUNTO
-    resetScommessa();
+    numBombe = 1;
     aggiornaMoltiplicatore();
 }

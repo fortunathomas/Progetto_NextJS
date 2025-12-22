@@ -344,7 +344,40 @@ function cashout() {
 export function resetGame() {
     popups.hideAllPopups();
     grid.clearGrid();
-    state.resetState();
+
+    // Salva la scommessa corrente prima del reset
+    const scommessaCorrente = state.totalescommessa;
+
+    // Reset dello stato
+    state.setInGioco(false);
+    state.setMoltiplicatore(1);
+    state.setTrovati(0);
+
+    // Resetta alla modalità 3x3
+    state.setVersione(1);
+
+    // Riattiva il pulsante 3x3
+    const v1 = document.getElementById("Versione1");
+    const v2 = document.getElementById("Versione2");
+    const v3 = document.getElementById("Versione3");
+
+    if (v1 && v2 && v3) {
+        v1.classList.add("active");
+        v2.classList.remove("active");
+        v3.classList.remove("active");
+    }
+
+    // Aggiorna max bombe per 3x3
+    if (window._aggiornaMaxBombe) {
+        window._aggiornaMaxBombe();
+    }
+
+    // Mantieni la scommessa precedente
+    state.setTotalescommessa(scommessaCorrente);
+    state.updateScommessaInput(scommessaCorrente);
+
+    // Aggiorna il moltiplicatore
+    state.aggiornaMoltiplicatore();
 }
 
 // Funzione wrapper per chiudere i popup (compatibilità con HTML)
