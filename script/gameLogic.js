@@ -7,6 +7,7 @@ import * as grid from './grid.js';
 import * as utils from './utils.js';
 import * as popups from './popups.js';
 import * as themes from './themes.js';
+import {hideGridWrapper} from "./grid.js";
 
 // ============================================================================
 //  FUNZIONE DI INIZIALIZZAZIONE PRINCIPALE
@@ -184,7 +185,9 @@ function cashout() {
     if (!state.inGioco) return;
 
     const premio = utils.calcolaPremioChashout(state.totalescommessa, state.cmoltiplicatore);
-    
+
+    hideGridWrapper(); // ← Aggiunto
+
     // Aggiorna il saldo (premio - scommessa iniziale)
     state.setCaramelle(state.getCaramelle() + premio - state.totalescommessa);
     state.setInGioco(false);

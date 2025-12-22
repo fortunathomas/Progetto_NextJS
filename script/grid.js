@@ -24,6 +24,7 @@ export function resetArrays() {
 export function clearGrid() {
     celle.forEach(c => c.remove());
     resetArrays();
+    hideGridWrapper(); // ← Aggiunto
 }
 
 // Crea la griglia di gioco
@@ -61,6 +62,8 @@ export function creaGriglia(versione, currentTheme) {
     const indiceBomba = utils.getRandomBombIndex(celle.length);
     tesori = [indiceBomba];
 
+    // Alla fine della funzione
+    showGridWrapper(); // ← Aggiunto
     return true;
 }
 
@@ -123,10 +126,11 @@ async function handleBombClick(cella) {
 
     await animations.delay(600);
 
+    hideGridWrapper();
     // Aggiorna il saldo
     state.setCaramelle(state.getCaramelle() - state.totalescommessa);
     state.setInGioco(false);
-    
+
     // Mostra popup di sconfitta
     popups.showLosePopup();
 }
@@ -155,6 +159,7 @@ async function handleDiamondClick(cella, versione) {
 async function handleVictory(versione) {
     await animations.delay(800);
 
+    hideGridWrapper();
     const bonus = utils.getBonusFinale(versione);
     const premio = utils.calcolaPremio(
         state.totalescommessa, 
@@ -168,4 +173,20 @@ async function handleVictory(versione) {
 
     // Mostra popup di vittoria
     popups.showWinPopup();
+}
+
+// Nasconde il wrapper della griglia
+export function hideGridWrapper() {
+    const gridWrapper = document.querySelector('.grid-wrapper');
+    if (gridWrapper) {
+        gridWrapper.classList.add('hidden');
+    }
+}
+
+// Mostra il wrapper della griglia
+export function showGridWrapper() {
+    const gridWrapper = document.querySelector('.grid-wrapper');
+    if (gridWrapper) {
+        gridWrapper.classList.remove('hidden');
+    }
 }
