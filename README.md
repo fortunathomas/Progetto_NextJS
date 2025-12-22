@@ -11,7 +11,7 @@
 
 ![Game Preview](https://via.placeholder.com/800x400/0b0f1a/ffc400?text=Caccia+al+Tesoro+%F0%9F%92%8E)
 
-[🎮 Gioca Ora](#-installazione) • [📖 Documentazione](#-come-giocare) • [🎨 Temi](#-temi-disponibili) • [🤝 Contribuisci](#-come-contribuire)
+[🎮 Gioca Ora](https://gambling-theta-drab.vercel.app/) • [📖 Documentazione](#-come-giocare) • [🎨 Temi](#-temi-disponibili) • [🤝 Contribuisci](#-come-contribuire)
 
 </div>
 
@@ -65,30 +65,7 @@
 
 ## 🚀 Installazione
 
-### Prerequisiti
-
-Prima di iniziare, assicurati di avere installato:
-
-- [Node.js](https://nodejs.org/) (versione 16.x o superiore)
-- [npm](https://www.npmjs.com/) o [yarn](https://yarnpkg.com/)
-
-### Guida Rapida
-
-```bash
-# 1️⃣ Clona il repository
-git clone https://github.com/tuo-username/caccia-al-tesoro.git
-
-# 2️⃣ Entra nella directory
-cd caccia-al-tesoro
-
-# 3️⃣ Installa le dipendenze
-npm install
-
-# 4️⃣ Avvia il server di sviluppo
-npm run dev
-```
-
-🎮 **Il gioco sarà disponibile su** → [http://localhost:3000](http://localhost:3000)
+🎮 **Il gioco è disponibile su** → [https://gambling-theta-drab.vercel.app/]
 
 ---
 
