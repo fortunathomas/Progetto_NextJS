@@ -9,12 +9,9 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-/node_modules
 /package-lock.json
 /package.json
-/gambling/node_modules
-/gambling/package.json
-/gambling/package-lock.json
+
 
 # testing
 /coverage
