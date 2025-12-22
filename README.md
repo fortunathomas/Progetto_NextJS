@@ -88,7 +88,7 @@ npm install
 npm run dev
 ```
 
-🎮 **Il gioco sarà disponibile su** → [http://localhost:3000](http://localhost:3000)
+🎮 **Il gioco sarà disponibile su** → [https://gambling-theta-drab.vercel.app/]
 
 ---
 
