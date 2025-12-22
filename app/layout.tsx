@@ -147,7 +147,6 @@ const Layout = ({ }: { children: React.ReactNode }) => {
                                 min="1"
                                 max="20"
                                 defaultValue="1"
-                                readOnly
                             />
                             <button id="increaseBombs" className="bomb-btn">+</button>
                         </div>

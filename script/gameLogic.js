@@ -21,16 +21,16 @@ export function initGame() {
         return;
     }
 
+    // ⬇️ SELEZIONA 3×3 PRIMA DI INIZIALIZZARE I CONTROLLI
+    state.setVersione(1);
+    elementi.v1.classList.add("active");
+
     // Inizializza i controlli
     initVersionControls(elementi);
     initBetControls(elementi);
-    initBombControls(); // ← AGGIUNTO
+    initBombControls(); // Ora versione è già 1, quindi sa che max è 7
     initActionButtons(elementi);
     initThemeSystem();
-
-    // Seleziona automaticamente la difficoltà Facile
-    state.setVersione(1);
-    elementi.v1.classList.add("active");
 
     // Inizializza il saldo iniziale
     state.setCaramelle(500);
@@ -243,11 +243,32 @@ function initBombControls() {
         state.aggiornaMoltiplicatore();
     });
 
+    // ⬇️ AGGIUNGI LISTENER PER PREVENIRE INPUT MANUALE OLTRE IL MAX
+    numBombeInput.addEventListener("input", () => {
+        if (state.inGioco) return;
+        let val = parseInt(numBombeInput.value) || 1;
+        const min = parseInt(numBombeInput.min) || 1;
+        const max = parseInt(numBombeInput.max);
+
+        if (val < min) {
+            numBombeInput.value = min;
+            val = min;
+        }
+        if (val > max) {
+            numBombeInput.value = max;
+            val = max;
+        }
+
+        state.setNumBombe(val);
+        aggiornaRischio();
+        state.aggiornaMoltiplicatore();
+    });
+
     // Esporta per usarla quando cambia versione
     window._aggiornaMaxBombe = aggiornaMaxBombe;
 
-    // Inizializzazione
-    aggiornaRischio();
+    // ⬇️ CHIAMA SUBITO ALL'INIZIALIZZAZIONE
+    aggiornaMaxBombe();
 }
 
 // ============================================================================
