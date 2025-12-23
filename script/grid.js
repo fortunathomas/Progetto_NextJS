@@ -132,7 +132,7 @@ async function handleCellClick(index, versione, numBombe) {
     // Animazione iniziale
     animations.addRevealAnimation(cella);
 
-    await animations.delay(200); // ← RIDOTTO da 300 a 200
+    await animations.delay(150); // ← RIDOTTO da 200 a 150
 
     cella.innerHTML = "";
 
@@ -157,7 +157,7 @@ async function handleBombClick(cella, versione, numBombe) {
     animations.shakeGrid();
 
     // Rivela tutte le celle
-    await animations.delay(200); // ← RIDOTTO da 300 a 200
+    await animations.delay(150); // ← RIDOTTO da 200 a 150
     celle.forEach((c, i) => {
         if (!cliccata[i]) {
             c.innerHTML = "";
@@ -171,7 +171,7 @@ async function handleBombClick(cella, versione, numBombe) {
         }
     });
 
-    await animations.delay(400); // ← RIDOTTO da 700 a 400
+    await animations.delay(300); // ← RIDOTTO da 400 a 300
 
     hideGridWrapper();
 
@@ -225,7 +225,7 @@ async function handleDiamondClick(cella, versione, numBombe) {
 // Gestisce la vittoria completa
 async function handleVictory(versione, numBombe) {
     // Rivela le bombe rimaste
-    await animations.delay(200); // ← RIDOTTO da 300 a 200
+    await animations.delay(150); // ← RIDOTTO da 200 a 150
     celle.forEach((c, i) => {
         if (!cliccata[i]) {
             c.innerHTML = "";
@@ -236,7 +236,7 @@ async function handleVictory(versione, numBombe) {
         }
     });
 
-    await animations.delay(500); // ← RIDOTTO da 900 a 500
+    await animations.delay(400); // ← RIDOTTO da 500 a 400
 
     const totaleCelle = utils.getTotaleCelle(versione);
     const bonus = utils.getBonusFinale(numBombe, totaleCelle);
