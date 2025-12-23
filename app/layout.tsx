@@ -7,6 +7,7 @@ import '@/styles/globals.css';
 import '@/styles/themes.css';
 import '@/styles/layout.css';
 import '@/styles/controls.css';
+import '@/styles/bomb-controls.css';
 import '@/styles/game.css';
 import '@/styles/popups.css';
 import '@/styles/animations.css';

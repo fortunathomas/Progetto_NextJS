@@ -7,6 +7,7 @@ import * as utils from './utils.js';
 import * as animations from './animations.js';
 import * as popups from './popups.js';
 import { getThemeImage } from './themes.js';
+import { onBalanceUpdate } from './gameLogic.js';
 
 // Array per gestire le celle
 export let celle = [];
@@ -177,6 +178,9 @@ async function handleBombClick(cella, versione, numBombe) {
     // Aggiorna il saldo
     state.setCaramelle(state.getCaramelle() - state.totalescommessa);
 
+    // ⬇️ VALIDA LA SCOMMESSA DOPO AVER PERSO
+    onBalanceUpdate();
+
     // Aggiorna statistiche
     const statEl = document.getElementById("statCelleTrovate");
     if (statEl) statEl.textContent = state.trovati;
@@ -241,6 +245,9 @@ async function handleVictory(versione, numBombe) {
 
     // Aggiorna il saldo
     state.setCaramelle(state.getCaramelle() + premio);
+
+    // ⬇️ VALIDA LA SCOMMESSA DOPO AVER VINTO
+    onBalanceUpdate();
 
     // Aggiorna statistiche
     const statEl = document.getElementById("statVincita");

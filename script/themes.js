@@ -136,7 +136,8 @@ export function applyTheme(themeName) {
     // Aggiorna i pulsanti del menu tema
     document.querySelectorAll('.theme-option').forEach(btn => {
         btn.classList.remove('active');
-        if (btn.dataset.theme === themeName) {
+        // ⬇️ USA getAttribute invece di dataset per React
+        if (btn.getAttribute('data-theme') === themeName) {
             btn.classList.add('active');
         }
     });
@@ -172,12 +173,14 @@ export function initThemeSwitcher(onThemeChange) {
     // Listener per ogni opzione tema
     document.querySelectorAll('.theme-option').forEach(btn => {
         btn.addEventListener('click', () => {
-            applyTheme(btn.dataset.theme);
+            // ⬇️ USA getAttribute invece di dataset per React
+            const themeName = btn.getAttribute('data-theme');
+            applyTheme(themeName);
             themeMenu.classList.add('hidden');
 
             // Callback per aggiornare le celle se il gioco è in corso
             if (onThemeChange) {
-                onThemeChange(btn.dataset.theme);
+                onThemeChange(themeName);
             }
         });
     });

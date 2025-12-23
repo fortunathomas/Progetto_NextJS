@@ -130,6 +130,21 @@ function setTotaleScommessa(n) {
     state.aggiornaMoltiplicatore();
 }
 
+// Valida la scommessa corrente contro il saldo disponibile
+function validaScommessaCorrente() {
+    const saldoAttuale = state.getCaramelle();
+
+    // Se la scommessa è maggiore del saldo, riducila al saldo disponibile
+    if (state.totalescommessa > saldoAttuale) {
+        setTotaleScommessa(saldoAttuale);
+    }
+}
+
+// Esporta per usarla dopo aggiornamenti del saldo
+export function onBalanceUpdate() {
+    validaScommessaCorrente();
+}
+
 // Aggiunge un importo alla scommessa
 function aggiungiScommessa(amount) {
     if (state.inGioco) return;
@@ -153,14 +168,14 @@ function initBombControls() {
     // Aggiorna il max quando cambia versione
     function aggiornaMaxBombe() {
         if (state.versione === 0) {
-            numBombeInput.max = 1;
+            numBombeInput.setAttribute('max', '1');
             state.setNumBombe(1);
             numBombeInput.value = 1;
             return;
         }
 
         const maxBombe = utils.getMaxBombe(state.versione);
-        numBombeInput.max = maxBombe;
+        numBombeInput.setAttribute('max', maxBombe.toString());
 
         if (state.numBombe > maxBombe) {
             state.setNumBombe(maxBombe);
@@ -208,8 +223,9 @@ function initBombControls() {
     // Listeners
     decreaseBombs.addEventListener("click", () => {
         if (state.inGioco) return;
-        const min = parseInt(numBombeInput.min) || 1;
-        if (state.numBombe > min) {
+        // Usa getAttribute per essere esplicito
+        const minAttr = parseInt(numBombeInput.getAttribute('min')) || 1;
+        if (state.numBombe > minAttr) {
             state.setNumBombe(state.numBombe - 1);
             numBombeInput.value = state.numBombe;
             aggiornaRischio();
@@ -219,8 +235,9 @@ function initBombControls() {
 
     increaseBombs.addEventListener("click", () => {
         if (state.inGioco) return;
-        const max = parseInt(numBombeInput.max);
-        if (state.numBombe < max) {
+        // max viene impostato dinamicamente in aggiornaMaxBombe()
+        const maxAttr = parseInt(numBombeInput.getAttribute('max'));
+        if (state.numBombe < maxAttr) {
             state.setNumBombe(state.numBombe + 1);
             numBombeInput.value = state.numBombe;
             aggiornaRischio();
@@ -231,11 +248,12 @@ function initBombControls() {
     numBombeInput.addEventListener("change", () => {
         if (state.inGioco) return;
         let val = parseInt(numBombeInput.value) || 1;
-        const min = parseInt(numBombeInput.min) || 1;
-        const max = parseInt(numBombeInput.max);
+        // Usa getAttribute per essere esplicito
+        const minAttr = parseInt(numBombeInput.getAttribute('min')) || 1;
+        const maxAttr = parseInt(numBombeInput.getAttribute('max'));
 
-        if (val < min) val = min;
-        if (val > max) val = max;
+        if (val < minAttr) val = minAttr;
+        if (val > maxAttr) val = maxAttr;
 
         state.setNumBombe(val);
         numBombeInput.value = val;
@@ -247,16 +265,17 @@ function initBombControls() {
     numBombeInput.addEventListener("input", () => {
         if (state.inGioco) return;
         let val = parseInt(numBombeInput.value) || 1;
-        const min = parseInt(numBombeInput.min) || 1;
-        const max = parseInt(numBombeInput.max);
+        // Usa getAttribute per essere esplicito
+        const minAttr = parseInt(numBombeInput.getAttribute('min')) || 1;
+        const maxAttr = parseInt(numBombeInput.getAttribute('max'));
 
-        if (val < min) {
-            numBombeInput.value = min;
-            val = min;
+        if (val < minAttr) {
+            numBombeInput.value = minAttr;
+            val = minAttr;
         }
-        if (val > max) {
-            numBombeInput.value = max;
-            val = max;
+        if (val > maxAttr) {
+            numBombeInput.value = maxAttr;
+            val = maxAttr;
         }
 
         state.setNumBombe(val);
@@ -350,6 +369,9 @@ function cashout() {
 
         state.setCaramelle(state.getCaramelle() + premio - state.totalescommessa);
 
+        // ⬇️ VALIDA LA SCOMMESSA DOPO CASHOUT
+        onBalanceUpdate();
+
         // Aggiorna statistiche
         const statEl = document.getElementById("statCashout");
         if (statEl) statEl.textContent = premio;
@@ -396,6 +418,9 @@ export function resetGame() {
     // Mantieni la scommessa precedente
     state.setTotalescommessa(scommessaCorrente);
     state.updateScommessaInput(scommessaCorrente);
+
+    // ⬇️ VALIDA LA SCOMMESSA CONTRO IL NUOVO SALDO
+    onBalanceUpdate();
 
     // Aggiorna il moltiplicatore
     state.aggiornaMoltiplicatore();
